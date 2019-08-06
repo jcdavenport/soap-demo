@@ -30,7 +30,8 @@ MD5 Checksum:&nbsp;<code style="background-color:lightgray;padding: 2px 6px 2px 
 &nbsp;&nbsp;&nbsp;&nbsp;It will help to have a basic understanding of Linux cli and computer
 networking to implement this scenario. I have automated about 90% of the configuration to get the containers up and running.  So really the only heavy lifting required is to install RancherOS on VirtualBox.  
 
-<br>
+<br>  
+
 **Read *Instructions.txt* in the service folder to get started!**
 
 
