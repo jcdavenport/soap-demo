@@ -1,0 +1,95 @@
+#Setting up the demo
+
+-> extract soap_demo.zip (if necessary) and upload service folder to RancherOS, i.e.
+$ scp -r -P 2200 ~/.ssh/rancher service rancher@[rancher's ip]:/home/rancher/
+
+-> in RancherOS, make setup.sh executable:
+$ cd service/
+$ chmod +x setup.sh
+
+-> run the setup script
+$ ./setup.sh
+
+###########################################
+### setup script will do the following: ###
+###########################################
+##
+## -> Install docker-compose:
+## $ sudo apt install -y docker-compose
+## $ sudo apt install -y docker-compose --fix-missing
+##
+##
+## -> change permissions for war files and gateway.config file
+## $ sudo chown 1001:root warfiles/* && sudo chmod 644 warfiles/*
+## $ sudo chown root:root gateway_config/gateway.config.yml
+## $ sudo chmod 644 gateway_config/gateway.config.yml
+##
+##
+## -> pull images and run demo containers in the background:
+## $ docker-compose up -d
+##
+##
+## -> Copy war service file into Tomcat:
+## $ docker cp warfiles/SOAP_Customer.war customers:/app
+## $ docker cp warfiles/SOAP_Product.war products:/app
+## $ docker cp warfiles/SOAP_Client.war client:/var/lib/jetty/webapps/ROOT.war
+##
+##
+## -> restart the service containers to load war file
+## $ docker restart customers
+## $ docker restart products
+##
+##############################
+###  setup.sh stops here!  ###
+##############################
+
+-> access shell within node container and create guts:
+$ docker exec -it gateway /bin/bash
+	# mkdir /opt/gateway 	
+	# npm install -g express-gateway
+	# eg gateway create
+	    What's the name of your Express Gateway? gateway
+		Where would you like to install your Express Gateway? (gateway)
+		What type of Express Gateway do you want to create? Getting Started with Express Gateway
+	# ctrl+d
+	
+
+-> Copy gateway.config.yml file to gateway container:
+$ docker cp gateway_config/gateway.config.yml gateway:/opt/gateway/config/
+
+
+-> start the gateway:
+$ docker exec -it gateway /bin/bash
+	# cd /opt/gateway
+	# npm start
+	# ctrl+z (pauses server)
+	# bg     (resumes server in background)
+	# ctrl+d (close connection while server continues to run)
+	
+
+
+*** The following is run on your host OS, i.e. Windows ***
+*** ENSURE VIRTUALBOX PORT FORWARDING IS CONFIGURED FOR PORTS 8090 and 8888 ***
+
+-> Access the client container from a localhost web browser and connect to the backend services:
+
+    a. start the XAMPP client server by extracting the xampp.zip file, go into the 
+	   extracted XMAPP folder and execute XAMPPLauncher.exec
+	   
+	   * run the client by clicking "start" next to the Tomcat option in the XAMPP window *
+
+    b. use a web browser(firefox/chrome) on Windows to access the client application:
+	    http://localhost:8090/SOAP_Client/sampleCustomerPortProxy/TestClient.jsp
+    
+    c. from the client web interface, click the "Set Endpoint" button and enter:
+        http://localhost:8080/api/customer
+		
+	d. try adding a customer and getAllCustomers to see if it's using the service through the gateway.
+	
+	e. once you have added a few customers, click the "All Customers" action, then click "Get Em All!" on the Input pane.  The results should show your customer data that is stored in the database.
+
+    f. access to the wsdl file has been enabled for demo purposes, and can be viewed at:
+	    http://localhost:8888/SOAP_Customer/ws/customers.wsdl
+
+
+SKOL!

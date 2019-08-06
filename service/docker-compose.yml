@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  database1:
+    image: mysql:latest
+    container_name: customerdb
+    environment:
+      MYSQL_ROOT_PASSWORD: paswurd
+      MYSQL_DATABASE: customer
+    networks:
+      test-net:
+        ipv4_address:  172.19.0.2
+        
+  database2:
+    image: mysql:latest
+    container_name: productdb
+    environment:
+      MYSQL_ROOT_PASSWORD: paswurd
+      MYSQL_DATABASE: product
+    networks:
+      test-net:
+        ipv4_address:  172.19.0.3
+  
+  tomcat1:
+    image: bitnami/tomcat
+    container_name: customers
+    ports:
+      - "8888:8080"
+    environment:
+      TOMCAT_ALLOW_REMOTE_MANAGEMENT: 1
+    networks:
+      test-net:
+        ipv4_address:  172.19.0.4
+      
+  tomcat2:
+    image: bitnami/tomcat
+    container_name: products
+    ports:
+      - "8899:8080"
+    environment:
+      TOMCAT_ALLOW_REMOTE_MANAGEMENT: 1
+    networks:
+      test-net:
+        ipv4_address:  172.19.0.5
+      
+  node:
+    image: node:latest
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    networks:
+      test-net:
+        ipv4_address:  172.19.0.6
+    entrypoint: tail -f /dev/null
+
+networks:
+  test-net:
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.19.0.0/16

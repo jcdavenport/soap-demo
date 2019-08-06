@@ -1,0 +1,62 @@
+http:
+  port: 8080
+admin:
+  port: 9876
+  host: localhost
+apiEndpoints:
+  # what clients connect to
+  httpbinAPI:
+    host: localhost
+    paths: '/api/ip'
+  customerAPI:
+    host: localhost
+    paths: '/api/customer'
+serviceEndpoints:
+  # what the gateway connects to
+  httpbinService:
+    url: 'https://httpbin.org'
+  customerService:
+    # docker bridged network
+    url: 'http://172.19.0.4:8080/SOAP_Customer/ws/customers'
+policies:
+  - basic-auth
+  - cors
+  - expression
+  - key-auth
+  - log
+  - oauth2
+  - proxy
+  - rate-limit
+pipelines:
+  httpbin:
+    apiEndpoints:
+      - httpbinAPI
+    policies:
+    # Uncomment `key-auth:` when instructed to in the Getting Started guide.
+    # - key-auth:
+      - proxy:
+          - action:
+              serviceEndpoint: httpbinService
+              changeOrigin: true
+              
+  customer:
+    apiEndpoints:
+      - customerAPI
+    policies:
+    # Uncomment `key-auth:` when instructed to in the Getting Started guide.
+    # - key-auth:
+      - proxy:
+          - action:
+              serviceEndpoint: customerService
+              changeOrigin: true  
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
